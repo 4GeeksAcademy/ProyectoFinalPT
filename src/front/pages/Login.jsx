@@ -12,7 +12,7 @@ const Login = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     try {
-      const response = await fetch(`${backendUrl}/login`, {
+      const response = await fetch(`${backendUrl}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -28,7 +28,7 @@ const Login = () => {
 
       localStorage.setItem("token", data.token);
 
-      navigate("/private", {
+      navigate("/dashboard", {
         state: { successMessage: "Inicio de sesión exitoso" },
       });
     } catch (error) {

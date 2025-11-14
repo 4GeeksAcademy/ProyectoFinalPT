@@ -10,7 +10,7 @@ const Register = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     try {
-      const response = await fetch(`${backendUrl}/register`, {
+      const response = await fetch(`${backendUrl}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -33,7 +33,11 @@ const Register = () => {
     }
   };
 
-  return <Form mode="register" onSubmit={handleSignup} />;
+  return (
+    <div className="register-page">
+      <Form mode="register" onSubmit={handleSignup} />
+    </div>
+  );
 };
 
 export default Register;

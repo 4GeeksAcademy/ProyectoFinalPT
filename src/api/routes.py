@@ -5,7 +5,7 @@ import jwt
 from werkzeug.security import check_password_hash
 from api.models import db, User
 from werkzeug.security import generate_password_hash
-from flask_cors import CORS
+
 
 
 def token_requerido(f):
@@ -26,9 +26,46 @@ def token_requerido(f):
 SECRET_KEY = "super-secret-key"
 
 api = Blueprint('api', __name__)
-CORS(api)
-
 reset_tokens = {}
+
+@api.route('/user', methods=['GET'])
+@token_requerido
+def get_user():
+    auth = request.headers.get('Authorization')
+    token = auth.split(' ')[1]
+    payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+    user_id = payload['user_id']
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    return jsonify(user.serialize()), 200
+
+
+@api.route('/user', methods=['PUT'])
+@token_requerido
+def update_user():
+    data = request.get_json()
+    auth = request.headers.get('Authorization')
+    token = auth.split(' ')[1]
+    payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+    user_id = payload['user_id']
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    new_email = data.get('email')
+    new_password = data.get('password')
+
+    if new_email:
+        if User.query.filter(User.email == new_email, User.id != user_id).first():
+            return jsonify({"msg": "El email ya está en uso"}), 400
+        user.email = new_email
+    if new_password:
+        from werkzeug.security import generate_password_hash
+        user.password = generate_password_hash(new_password)
+
+    db.session.commit()
+    return jsonify({"msg": "Usuario actualizado correctamente"}), 200
 
 
 @api.route('/forgot-password', methods=['POST'])
