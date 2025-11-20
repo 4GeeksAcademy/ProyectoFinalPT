@@ -10,17 +10,14 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
-from flask_cors import CORS
 
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
-
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-CORS(app, resources={r"/*": {"origins": "*"}})
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -73,9 +70,3 @@ def serve_any_other_file(path):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
-
-from api.routesTasks import api_tasks
-app.register_blueprint(api_tasks, url_prefix='/api/users')
-
-from api.routesUser import api_user
-app.register_blueprint(api_user, url_prefix='/api/users')

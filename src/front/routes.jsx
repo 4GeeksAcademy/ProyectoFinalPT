@@ -15,7 +15,7 @@ import { Profile } from "./pages/Profile";
 import { Groups } from "./pages/Groups";
 import { TaskUser } from "./pages/TaskUser";
 import { Finances } from "./pages/Finances";
-
+import { Config } from "./pages/Config"
 export const router = createBrowserRouter(
   createRoutesFromElements(
     // CreateRoutesFromElements function allows you to build route elements declaratively.
@@ -38,6 +38,7 @@ export const router = createBrowserRouter(
         <Route path="/groups" element={<Groups />} />
         <Route path="/tasks" element={<TaskUser />} /> 
         <Route path="/finances" element={<Finances />} /> 
+        <Route path="/config" element={<Config />} />
       </Route>
     )
 );

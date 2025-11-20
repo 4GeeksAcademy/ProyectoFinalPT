@@ -176,20 +176,15 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                 {mode === "login" && "Iniciar Sesión"}
                 {mode === "config" && "Guardar Cambios"}
               </button>
-              {
-                mode === "register" ? (
-                  <p>
-                    ¿Ya tienes cuenta?
-                    <Link to={"/login"}>Inicia sesión </Link>
-                  </p>
-                ) : (
-                  <p>
-
-                    ¿No tienes cuenta?
-                    <Link to={"/register"}>Registrate </Link>
-                  </p>
-                )
-              }
+              {mode === "register" ? (
+                <p>
+                  ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+                </p>
+              ) : mode === "login" ? (
+                <p>
+                  ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+                </p>
+              ) : null}
 
               {mode === "config" && (
                 <Link to="/dashboard" className="btn btn-danger w-100 mb-3">

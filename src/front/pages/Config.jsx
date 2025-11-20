@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Form from "../components/Form.jsx";
 
-const Config = () => {
+export const Config = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [userData, setUserData] = useState({ email: "", password: "********" });
   const [errorMsn, setErrorMsn] = useState(null);
@@ -72,4 +72,3 @@ const Config = () => {
   );
 };
 
-export default Config;
