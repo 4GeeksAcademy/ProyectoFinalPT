@@ -18,8 +18,10 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
     const [titulo, setTitulo] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [direccion, setDireccion] = useState("");
+    const [date, setDate] = useState("");
     const [lat, setLat] = useState(20);
     const [lng, setLng] = useState(-99);
+
     const [msg, setMsg] = useState("");
 
     // EFECTO: Rellena el formulario si estamos editando
@@ -42,10 +44,18 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
         e.preventDefault();
         setMsg("");
 
-        if (!titulo.trim()) { 
+
+   if (!titulo.trim()) { 
             setMsg("El título es obligatorio.");
             return;
         }
+  setTitulo("");
+        setDescripcion("");
+        setDireccion("");
+        setDate("");
+        setLat("");
+        setLng("");
+        setMsg("Tarea creada (mock)");
 
         const payloadData = {
             id: taskToEdit ? taskToEdit.id : undefined, // Importante para editar
@@ -78,62 +88,33 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
     };
 
     return (
-        <div className="modal" tabIndex="-1" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog modal-dialog-centered">
-                <form className="modal-content modal-content-dark" onSubmit={handleSubmit}>
-                    <div className="modal-header">
-                        <h5 className="modal-title">
-                            <i className={`fas ${isEditing ? 'fa-edit' : 'fa-plus'} me-2`}></i>
-                            {modalTitle}
-                        </h5>
-                        <button type="button" className="btn-close btn-close-white" onClick={() => setShowTaskModal(false)}></button>
-                    </div>
-
-                    <div className="modal-body">
-                        <div className="mb-3">
-                            <label className="form-label">Título</label>
-                            <input 
-                                type="text"
-                                placeholder="Ej: Comprar leche" 
-                                value={titulo} 
-                                onChange={e => setTitulo(e.target.value)} 
-                                className="form-control" 
-                                required 
-                            />
-                        </div>
-                        
-                        <div className="mb-3">
-                            <label className="form-label">Descripción</label>
-                            <textarea 
-                                placeholder="Detalles adicionales..." 
-                                value={descripcion} 
-                                onChange={e => setDescripcion(e.target.value)} 
-                                className="form-control" 
-                                rows="3" 
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="form-label">Ubicación (Opcional)</label>
-                            <GoogleMaps lat={lat} lng={lng} setLat={setLat} setLng={setLng} /> 
-                            <input 
-                                type="text"
-                                placeholder="Dirección escrita" 
-                                value={direccion} 
-                                onChange={e => setDireccion(e.target.value)} 
-                                className="form-control mt-2" 
-                            />
-                        </div>
-
-                        {msg && <div className="alert alert-warning text-center">{msg}</div>}
-                    </div>
-
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowTaskModal(false)}>Cancelar</button>
-                        <button type="submit" className={`btn ${buttonColor}`}>{buttonText}</button>
-                    </div>
-                </form>
-            </div>
+        <div className="modal" tabIndex="-1" style={{ display: "block" }}>
+            <form className="Form modal-dialog modal-dialog-centered" onSubmit={handleSubmit}>
+                <div className="modal-header">
+                    <h5 className="modal-title" style={{ color: "#1e91ed" }}>
+                        Añadir Tarea de Clan
+                    </h5>
+                </div>
+                <input placeholder="Título" value={titulo} onChange={e => setTitulo(e.target.value)} style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }} />
+                <input 
+                    type="text"
+                    value={date}
+                    onChange={e => setDate(e.target.value)}
+                    placeholder="Fecha"
+                    style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10, color: date ? '#1e91ed' : '#bdbdbd' }}
+                    pattern="^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/\d{4}$"
+                    title="Formato: dd/mm/aaaa"
+                    inputMode="numeric"
+                />
+                <textarea placeholder="Descripción" value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10, minHeight: 60 }} />
+                <input placeholder="Dirección" value={direccion} onChange={e => setDireccion(e.target.value)} style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }} />
+                <GoogleMaps lat={lat} lng={lng} setLat={setLat} setLng={setLng} />
+                <div className="modal-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowTaskModal(false)} style={{ fontWeight: 600, fontSize: 18 }}>Cancelar</button>
+                    <button type="submit" className="btn btn-custom-blue" style={{ fontWeight: 600, fontSize: 18 }}>Crear tarea</button>
+                </div>
+                <div style={{ color: "#7f00b2", marginTop: 16, textAlign: "center" }}>{msg}</div>
+            </form>
         </div>
     );
 }
