@@ -7,14 +7,14 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const successMessage = location.state?.successMessage;
-  const { store, dispatch } = useGlobalReducer();
+  const { dispatch } = useGlobalReducer();
 
   const handleLogin = async ({ email, password, setErrorMsn }) => {
     setErrorMsn(null);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     try {
-      const response = await fetch(`${backendUrl}api/users/login`, {
+      const response = await fetch(`${backendUrl}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -28,9 +28,26 @@ const Login = () => {
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      dispatch({ type: "SET_USER_INFO", payload: data.user });
-
+      dispatch({ type: "SET_TOKEN", payload: { token: data.token } });
+      dispatch({
+        type: "LOAD_DATA_FROM_BACKEND", payload: {
+          user: data.user,
+          profile: {
+            name: data.user.name,
+            email: data.user.email,
+            avatar: data.user.avatar,
+            presentation: data.user.presentation,
+            location: data.user.location,
+            age: data.user.age,
+            phone: data.user.phone,
+            gender: data.user.gender,
+            social: data.user.social,
+          },
+          userTasks: data.userTasks || [],
+          clans: data.clans || [],
+          clanTasks: data.clanTasks || []
+        }
+      });
 
       navigate("/dashboard", {
         state: { successMessage: "Inicio de sesión exitoso" },

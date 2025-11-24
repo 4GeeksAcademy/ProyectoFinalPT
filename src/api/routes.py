@@ -1,11 +1,10 @@
 from flask import request, jsonify, Blueprint
-from flask_cors import CORS
 import secrets
 from werkzeug.security import generate_password_hash
 from api.models import db, User
 
 api = Blueprint('api', __name__)
-CORS(api)
+
 reset_tokens = {}
 
 @api.route('/forgot-password', methods=['POST'])

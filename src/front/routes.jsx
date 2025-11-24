@@ -5,6 +5,7 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
 import { Layout } from "./pages/Layout";
 import { Dashboard } from "./pages/Dashboard";
 import { Single } from "./pages/Single";
@@ -27,24 +28,80 @@ export const router = createBrowserRouter(
     // Note: keep in mind that errorElement will be the default page when you don't get a route, customize that page to make your project more attractive.
     // Note: The child paths of the Layout element replace the Outlet component with the elements contained in the "element" attribute of these child paths.
 
-      // Root Route: All navigation will start from here.
-        <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} /> {/* Ruta explícita */}
-        {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
-        
-        <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
-        <Route path="/demo" element={<Demo />} />
-        <Route path="/register" element={<Register/>} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/groups" element={<Groups />} />
-        <Route path="/tasks" element={<TaskUser />} /> 
-        <Route path="/finances" element={<Finances />} /> 
-        <Route path="/config" element={<Config />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/shared-tasks" element={<SharedTasks />} />
-        <Route path="/chat" element={<Chat />} />
-      </Route>
-    )
+    // Root Route: All navigation will start from here.
+    <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
+      <Route path="/" element={<Home />} />
+      <Route path="/home" element={<Home />} /> {/* Ruta explícita */}
+      {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
+
+      <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
+      <Route path="/demo" element={<Demo />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <PrivateRoute>
+            <TaskUser />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/finances"
+        element={
+          <PrivateRoute>
+            <Finances />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/config"
+        element={
+          <PrivateRoute>
+            <Config />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/shared-tasks"
+        element={
+          <PrivateRoute>
+            <SharedTasks />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <PrivateRoute>
+            <Chat />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/groups"
+        element={
+          <PrivateRoute>
+            <Groups />
+          </PrivateRoute>
+        }
+      />
+    </Route>
+  )
 );

@@ -3,19 +3,18 @@ import secrets
 from datetime import datetime, timedelta, timezone
 import jwt
 from werkzeug.security import check_password_hash
-from api.models import db, Tareas, TareasAsignadas, Mision, Evento, Prioridad, Estado, User
+from api.models import db, Task, TareasAsignadas, Mision, Evento, Prioridad, Estado, User
 from werkzeug.security import generate_password_hash
-from flask_cors import CORS
+
 
 api_tasks = Blueprint('apiTasks', __name__)
 
 # Allow CORS requests to this API
-CORS(api_tasks)
 
 
 @api_tasks.route('/tareas', methods=['GET'])
 def get_tareas():
-    varTareas = Tareas.query.all()
+    varTareas = Task.query.all()
     tareas_serialized = []
     for cicloFor_varTareas in varTareas:
         tareas_serialized.append(cicloFor_varTareas.serialize())
@@ -47,7 +46,7 @@ def get_tareas_user(user_id):
 @api_tasks.route('/<int:user_id>/tareas/<int:tareas_id>', methods=['POST'])
 def asignar_tarea_user(user_id, tareas_id):
     varUser = User.query.get(user_id)
-    varTareas = Tareas.query.get(tareas_id)
+    varTareas = Task.query.get(tareas_id)
 
     if varUser is None:
         return jsonify({'msg': f'Usuario con ID {user_id} no existe'}), 404
@@ -69,25 +68,27 @@ def agregar_tarea_user(user_id):
     if varUser is None:
         return jsonify({"msg": f"Usuario con ID {user_id} no existe"}), 404
 
-    titulo = data.get("titulo")
-    descripcion = data.get("descripcion")
-    fecha = data.get("fecha")
+    title = data.get("title")
+    description = data.get("description")
+    date = data.get("date")
+    lat = data.get("lat")
+    lng = data.get("lng")
+    estado_id = data.get("estado_id")
     evento_id = data.get("evento_id")
     prioridad_id = data.get("prioridad_id")
-    estado_id = data.get("estado_id")
-    imagen = data.get("imagen")
 
-    if not titulo:
+    if not title:
         return jsonify({"msg": "El título es obligatorio"}), 400
 
-    nueva_tarea = Tareas(
-        titulo=titulo,
-        descripcion=descripcion,
-        fecha=fecha,
-        evento_id=evento_id,
-        prioridad_id=prioridad_id,
+    nueva_tarea = Task(
+        title=title,
+        description=description,
+        date=date,
+        lat=lat,
+        lng=lng,
         estado_id=estado_id,
-        imagen=imagen
+        evento_id=evento_id,
+        prioridad_id=prioridad_id
     )
 
     db.session.add(nueva_tarea)
@@ -102,7 +103,7 @@ def agregar_tarea_user(user_id):
     db.session.commit()
 
     return jsonify({
-        "msg": f"Tarea '{titulo}' creada y asignada al usuario {varUser.email}",
+        "msg": f"Tarea '{title}' creada y asignada al usuario {varUser.email}",
         "tarea": nueva_tarea.serialize(),
         "asignacion": asignacion.serialize()
     }), 201
@@ -110,7 +111,7 @@ def agregar_tarea_user(user_id):
 
 @api_tasks.route('/<int:user_id>/tareas/<int:tareas_id>/editar', methods=['PUT'])
 def editar_tarea_user(user_id, tareas_id):
-    varTarea = Tareas.query.get(tareas_id)
+    varTarea = Task.query.get(tareas_id)
     varUser = User.query.get(user_id)
     if varTarea is None:
         return jsonify({'msg': f'La tarea con ID {tareas_id} no existe'}), 404
@@ -121,47 +122,34 @@ def editar_tarea_user(user_id, tareas_id):
     if body is None:
         return jsonify({'msg': 'No se encuentra body, no hay datos que actualizar'}), 400
 
-    if "titulo" in body:
-        varTarea.titulo = body["titulo"]
-    if "descripcion" in body:
-        varTarea.descripcion = body["descripcion"]
-    if "evento_id" in body:
-        varTarea.evento_id = body["evento_id"]    
-
-    if "estado" in body:
-        estado_actual = body["estado"].strip()
-        nuevo_estado = Estado.query.filter(
-            Estado.tipo == estado_actual
-        ).first()
-        if nuevo_estado is None:
-            return jsonify({'msg': f'El estado "{estado_actual}" no existe.'}), 404
-        varTarea.estado_id = nuevo_estado.id
-    
-    if "fecha" in body:
+    if "title" in body:
+        varTarea.title = body["title"]
+    if "description" in body:
+        varTarea.description = body["description"]
+    if "date" in body:
         try:
-            varTarea.fecha = datetime.fromisoformat(body["fecha"])
+            varTarea.date = datetime.fromisoformat(body["date"])
         except:
             return jsonify({'msg': 'Fecha incorrecta. Usa formato ISO: YYYY-MM-DD HH:MM:SS'}), 400
-
-    if "imagen" in body:
-        varTarea.imagen = body["imagen"]
-
-    if "prioridad" in body:
-        prioridad_actual = body["prioridad"].strip()
-        nueva_prioridad = Prioridad.query.filter(
-            Prioridad.nivel == prioridad_actual
-        ).first()
-        if nueva_prioridad is None:
-            return jsonify({'msg': f'La prioridad "{prioridad_actual}" no existe.'}), 404
-        varTarea.prioridad_id = nueva_prioridad.id
+    if "lat" in body:
+        varTarea.lat = body["lat"]
+    if "lng" in body:
+        varTarea.lng = body["lng"]
+    if "estado_id" in body:
+        varTarea.estado_id = body["estado_id"]
+    if "evento_id" in body:
+        varTarea.evento_id = body["evento_id"]
+    if "prioridad_id" in body:
+        varTarea.prioridad_id = body["prioridad_id"]
 
     db.session.commit()
 
     return jsonify({'msg': 'Se ha editado la Tarea Correctamente', 'Tarea': varTarea.serialize()}), 202
 
+
 @api_tasks.route('/<int:user_id>/tareas/<int:tareas_id>/editar/eventos/<int:evento_id>', methods=['PUT'])
 def editar_evento_user(user_id, tareas_id, evento_id):
-    varTarea = Tareas.query.get(tareas_id)
+    varTarea = Task.query.get(tareas_id)
     varUser = User.query.get(user_id)
     varEvento = Evento.query.get(evento_id)
     if varTarea is None:
@@ -178,11 +166,12 @@ def editar_evento_user(user_id, tareas_id, evento_id):
     if "titulo" in body:
         varEvento.titulo = body["titulo"]
     if "lugar" in body:
-        varEvento.lugar = body["lugar"]  
-    
+        varEvento.lugar = body["lugar"]
+
     db.session.commit()
 
     return jsonify({'msg': 'Se ha editado el evento Correctamente', 'Evento': varEvento.serialize()}), 202
+
 
 @api_tasks.route('/<int:user_id>/tareas/<int:tareas_id>/desasignar', methods=['DELETE'])
 def desasignar_tarea(user_id, tareas_id):
@@ -208,12 +197,11 @@ def desasignar_tarea(user_id, tareas_id):
 
 @api_tasks.route('/<int:user_id>/tareas/<int:tareas_id>/eliminar', methods=['DELETE'])
 def eliminar_tarea(user_id, tareas_id):
-
     varUser = User.query.get(user_id)
     if varUser is None:
         return jsonify({'msg': f'El usuario con ID {user_id} no existe'}), 404
 
-    varTarea = Tareas.query.get(tareas_id)
+    varTarea = Task.query.get(tareas_id)
     if varTarea is None:
         return jsonify({'msg': f'La tarea con ID {tareas_id} no existe'}), 404
 
@@ -222,9 +210,7 @@ def eliminar_tarea(user_id, tareas_id):
     db.session.delete(varTarea)
     db.session.commit()
 
-    return jsonify({
-        'msg': f'La tarea con ID {tareas_id} ha sido eliminada correctamente'
-    }), 200
+    return jsonify({'msg': f'La tarea con ID {tareas_id} ha sido eliminada correctamente'}), 200
 
 
 @api_tasks.route('/hello', methods=['POST', 'GET'])

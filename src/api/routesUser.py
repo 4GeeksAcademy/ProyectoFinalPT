@@ -2,15 +2,15 @@ from flask import request, jsonify, Blueprint
 from datetime import datetime, timedelta, timezone
 from api.models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_cors import CORS
 import jwt
 
 api_user = Blueprint('apiUser', __name__)
-CORS(api_user)
 SECRET_KEY = "super-secret-key"
 
 def token_requerido(f):
     def wrapper(*args, **kwargs):
+        if request.method == 'OPTIONS':
+            return jsonify({}), 200
         auth = request.headers.get('Authorization')
         if not auth or not auth.startswith('Bearer '):
             return jsonify({"msg": "Token requerido"}), 401
@@ -24,19 +24,20 @@ def token_requerido(f):
     return wrapper
 
 @api_user.route('/register', methods=['POST'])
-def crear_perfil():
+def create_profile():
     body = request.get_json()
     email = body.get('email')
     password = body.get('password')
-    if not email or not password:
-        return jsonify({"msg": "Falta correo o contraseña"}), 400
+    name = body.get('name')
+    if not email or not password or not name:
+        return jsonify({"msg": "Falta correo, contraseña o nombre"}), 400
     if User.query.filter_by(email=email).first():
         return jsonify({"msg": "El usuario ya existe"}), 400
     hashed_password = generate_password_hash(password)
     nuevo_perfil = User(
         email=email,
         password=hashed_password,
-        name=body.get("name"),
+        name=name,
         photo=body.get("photo"),
         bio=body.get("bio"),
         phone=body.get("phone"),
@@ -67,7 +68,7 @@ def login():
     }, SECRET_KEY, algorithm="HS256")
     return jsonify({"token": token, "user": user.serialize()}), 200
 
-@api_user.route('/user', methods=['GET'])
+@api_user.route('/<int:user_id>', methods=['GET'])
 @token_requerido
 def get_user():
     auth = request.headers.get('Authorization')
@@ -78,22 +79,43 @@ def get_user():
         return jsonify({"msg": "Usuario no encontrado"}), 404
     return jsonify(user.serialize()), 200
 
-@api_user.route('/user', methods=['PUT'])
+
+@api_user.route('/<int:user_id>', methods=['PUT', 'OPTIONS'])
 @token_requerido
-def update_user():
-    data = request.get_json()
-    auth = request.headers.get('Authorization')
+def update_user(user_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
+    data = request.get_json() or {}
+    auth = request.headers.get('Authorization', '')
+    if not auth.startswith('Bearer '):
+        return jsonify({"msg": "Token no proporcionado"}), 401
+
     token = auth.split(' ')[1]
-    payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-    user = User.query.get(payload['user_id'])
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        return jsonify({"msg": "Token expirado"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"msg": "Token inválido"}), 401
+
+    if payload['user_id'] != user_id:
+        return jsonify({"msg": "No autorizado para actualizar este usuario"}), 403
+
+    user = User.query.get(user_id)
     if not user:
         return jsonify({"msg": "Usuario no encontrado"}), 404
-    if data.get('email'):
-        if User.query.filter(User.email == data['email'], User.id != user.id).first():
+
+    email = data.get('email')
+    if email:
+        if User.query.filter(User.email == email, User.id != user.id).first():
             return jsonify({"msg": "El email ya está en uso"}), 400
-        user.email = data['email']
-    if data.get('password'):
-        user.password = generate_password_hash(data['password'])
+        user.email = email
+
+    password = data.get('password')
+    if password:
+        user.password = generate_password_hash(password)
+
     user.name = data.get('name', user.name)
     user.photo = data.get('photo', user.photo)
     user.bio = data.get('bio', user.bio)
@@ -104,15 +126,14 @@ def update_user():
     user.twitter = data.get('twitter', user.twitter)
     user.facebook = data.get('facebook', user.facebook)
     user.instagram = data.get('instagram', user.instagram)
-    db.session.commit()
-    return jsonify({"msg": "Usuario actualizado correctamente", "perfil": user.serialize()}), 200
 
+    db.session.commit()
+
+    return jsonify({"msg": "Usuario actualizado correctamente", "perfil": user.serialize()}), 200
 
 @api_user.route('/Saluda', methods=['POST', 'GET'])
 def handle_hello():
-
     response_body = {
         "message": "Este ya es el endpoint de Los usuarios Osea de cada user de la tabla"
     }
-
     return jsonify(response_body), 200
