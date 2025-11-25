@@ -3,35 +3,30 @@ import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import "../styles/ProfileGroups.css";
 import ModalCreateTask from "../components/ModalCreateTask";
+import TaskDetailModal from "../components/TaskDetailModal";
 
 // --- ACTUALIZADO: TaskListItem ahora recibe onEdit ---
-const TaskListItem = ({ task, onToggle, onDelete, onEdit }) => (
+const TaskListItem = ({ task, onToggle, onDelete, onEdit, onClick }) => (
     <li className="list-group-item d-flex justify-content-between align-items-center task-list-item"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}>
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+        onClick={typeof onClick === 'function' ? onClick : undefined}
+    >
         <span
             className={`task-text ${task.completed ? 'completed' : ''}`}
-            onClick={() => onToggle(task.id)}
             style={{ cursor: "pointer", color: task.completed ? '#888' : '#333' }}
         >
             {task.title}
         </span>
         <div>
             <i
-                className={`fas ${task.completed ? 'fa-check-square text-success' : 'fa-square'}`}
-                onClick={() => onToggle(task.id)}
-                style={{ cursor: "pointer", marginRight: "10px" }}
-                title="Completar"
-            ></i>
-            {/* --- NUEVO BOTÓN EDITAR --- */}
-            <i
                 className="fas fa-pencil-alt text-primary ms-2"
-                onClick={() => onEdit(task)}
+                onClick={e => { e.stopPropagation(); onEdit(task); }}
                 style={{ cursor: "pointer", marginRight: "10px" }}
                 title="Editar"
             ></i>
             <i
                 className="fas fa-trash text-danger ms-2"
-                onClick={() => onDelete(task.id)}
+                onClick={e => { e.stopPropagation(); onDelete(task.id); }}
                 style={{ cursor: "pointer" }}
                 title="Eliminar"
             ></i>
@@ -44,10 +39,11 @@ export const Dashboard = () => {
     const navigate = useNavigate();
 
     const [showTaskModal, setShowTaskModal] = useState(false);
-    const [taskType, setTaskType] = useState("user"); 
-    
+    const [taskType, setTaskType] = useState("user");
+
     // --- NUEVO ESTADO: Tarea a editar ---
     const [taskToEdit, setTaskToEdit] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const pendingUserTasks = store.userTasks;
     const activeClan = store.clans.find(c => c.id === store.activeClanId);
@@ -76,17 +72,30 @@ export const Dashboard = () => {
     const toggleClanTask = (taskId) => dispatch({ type: 'TOGGLE_CLAN_TASK', payload: { taskId } });
     const deleteClanTask = (taskId) => dispatch({ type: 'DELETE_CLAN_TASK', payload: { taskId } });
 
+    const handleShowDetailModal = () => {
+        setShowDetailModal(true);
+    };
+
     return (
         <div className="dashboard-container">
-            
+            <TaskDetailModal show={showDetailModal} onClose={() => setShowDetailModal(false)} taskList={pendingUserTasks} />
+
             {showTaskModal && (
-                <ModalCreateTask 
-                    setShowTaskModal={setShowTaskModal} 
-                    taskType={taskType} 
+                <ModalCreateTask
+                    setShowTaskModal={setShowTaskModal}
+                    taskType={taskType}
                     taskToEdit={taskToEdit} // Pasamos la tarea (o null)
                 />
             )}
             {(showTaskModal) && <div className="modal-backdrop fade show"></div>}
+
+            {showDetailModal && (
+                <TaskDetailModal
+                    showDetailModal={showDetailModal}
+                    setShowDetailModal={setShowDetailModal}
+                />
+            )}
+            {(showDetailModal) && <div className="modal-backdrop fade show"></div>}
 
             <div className="dashboard-sidebar">
                 <div className="sidebar-header">
@@ -118,7 +127,7 @@ export const Dashboard = () => {
                     </div>
 
                     <div className="row g-4 dashboard-cards">
-                        
+
                         {/* Tareas Pendientes */}
                         <div className="col-lg-6">
                             <div className="dashboard-card">
@@ -136,7 +145,8 @@ export const Dashboard = () => {
                                                 task={task}
                                                 onToggle={toggleUserTask}
                                                 onDelete={deleteUserTask}
-                                                onEdit={(t) => openEditModal(t, 'user')} // <-- Pasamos el handler
+                                                onEdit={(t) => openEditModal(t, 'user')}
+                                                onClick={handleShowDetailModal}
                                             />
                                         ))
                                     ) : (
@@ -176,7 +186,7 @@ export const Dashboard = () => {
 
                         {/* Resumen Financiero */}
                         <div className="col-lg-12">
-                             <div className="dashboard-card">
+                            <div className="dashboard-card">
                                 <h3 className="mb-0">Resumen Financiero</h3>
                                 <div className="row">
                                     <div className="col-md-6 text-center border-end">

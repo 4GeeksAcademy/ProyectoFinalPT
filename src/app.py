@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 CORS(app, resources={
     r"/api/*": {
-        "origins": "https://organic-lamp-4446j5pq7jqhj7g4-3000.app.github.dev",
+        "origins": "https://shiny-xylophone-97xjjrww4vrp2766r-3000.app.github.dev",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
@@ -42,15 +42,18 @@ app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(api_user, url_prefix='/api/users')
 app.register_blueprint(api_tasks, url_prefix='/api/users')
 
+
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
+
 
 @app.route('/')
 def sitemap():
     if ENV == "development":
         return generate_sitemap(app)
     return send_from_directory(static_file_dir, 'index.html')
+
 
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
@@ -60,9 +63,7 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0
     return response
 
+
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
-    
-
-

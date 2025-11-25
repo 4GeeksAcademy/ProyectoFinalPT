@@ -15,6 +15,7 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
 
     // Estados
     const [titulo, setTitulo] = useState("");
+    const [fecha, setFecha] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [direccion, setDireccion] = useState("");
     const [date, setDate] = useState("");
@@ -26,38 +27,48 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
     useEffect(() => {
         if (taskToEdit) {
             setTitulo(taskToEdit.title || "");
+            setFecha(taskToEdit.date || "");
             setDescripcion(taskToEdit.description || "");
             setDireccion(taskToEdit.address || "");
             setLat(taskToEdit.latitude || 20);
             setLng(taskToEdit.longitude || -99);
         } else {
-            // Limpiar si es creación nueva
+            setTitulo("");
+            setFecha("");
+            setDescripcion("");
+            setDireccion("");
+        }
+    }, [taskToEdit]);
+
+    // Solo un input de dirección, sincronizado con el mapa
+
+    useEffect(() => {
+        if (taskToEdit) {
+            setTitulo(taskToEdit.title || "");
+            setDescripcion(taskToEdit.description || "");
+            setDireccion(taskToEdit.address || "");
+            setLat(taskToEdit.latitude || 20);
+            setLng(taskToEdit.longitude || -99);
+        } else {
             setTitulo("");
             setDescripcion("");
             setDireccion("");
         }
     }, [taskToEdit]);
 
+    // Sincronización: si el mapa cambia la dirección, actualiza el input
+    const handleMapAddressChange = (address) => {
+        setDireccion(address);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setMsg("");
 
-
-        if (!titulo.trim()) {
-            setMsg("El título es obligatorio.");
-            return;
-        }
-        setTitulo("");
-        setDescripcion("");
-        setDireccion("");
-        setDate("");
-        setLat("");
-        setLng("");
-        setMsg("Tarea creada (mock)");
-
         const payloadData = {
-            id: taskToEdit ? taskToEdit.id : undefined, // Importante para editar
+            id: taskToEdit ? taskToEdit.id : undefined,
             title: titulo,
+            date: fecha,
             description: descripcion,
             address: direccion,
             latitude: lat,
@@ -69,22 +80,26 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
                 setMsg("Error: No hay clan activo.");
                 return;
             }
-            // Dispatch específico para CLAN (Crear o Editar)
             dispatch({
                 type: isEditing ? 'UPDATE_CLAN_TASK' : 'ADD_TASK_TO_CLAN',
                 payload: { ...payloadData, clanId: activeClanId }
             });
         } else {
-            // Dispatch específico para USER (Crear o Editar)
             dispatch({
                 type: isEditing ? 'UPDATE_USER_TASK' : 'ADD_USER_TASK',
                 payload: payloadData
             });
         }
 
+        setTitulo("");
+        setDescripcion("");
+        setDireccion("");
+        setDate("");
+        setLat(20);
+        setLng(-99);
+        setMsg(isEditing ? "Tarea actualizada" : "Tarea creada");
         setShowTaskModal(false);
     };
-    console.log(lat, lng)
 
     return (
         <div className="modal" tabIndex="-1" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)", padding: "3rem" }}>
@@ -92,19 +107,39 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
                 <form className="modal-content modal-content-dark" style={{ padding: "1.5rem" }} onSubmit={handleSubmit}>
                     <div className="modal-header">
                         <h5 className="modal-title">
-                            <i className={`fas ${isEditing ? 'fa-edit' : 'fa-plus'} me-2`}></i>
                             {modalTitle}
                         </h5>
                         <button type="button" className="btn-close btn-close-white" onClick={() => setShowTaskModal(false)}></button>
                     </div>
-                    <input placeholder="Título" value={titulo} onChange={e => setTitulo(e.target.value)} style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }} />
+                    <input
+                        placeholder="Título"
+                        value={titulo}
+                        onChange={e => setTitulo(e.target.value)}
+                        style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }}
+                    />
+                    <input
+                        placeholder="Fecha"
+                        value={fecha}
+                        onChange={e => {
+                            let v = e.target.value.replace(/[^0-9]/g, "");
+                            if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+                            if (v.length > 5) v = v.slice(0, 5) + "/" + v.slice(5, 9);
+                            if (v.length > 10) v = v.slice(0, 10);
+                            setFecha(v);
+                        }}
+                        maxLength={10}
+                        style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }}
+                        inputMode="numeric"
+                    />
                     <textarea placeholder="Descripción" value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10, minHeight: 60 }} />
-                    <input placeholder="Dirección" value={direccion} onChange={e => setDireccion(e.target.value)} style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }} />
+                    {/* Input de dirección eliminado, solo queda el campo sincronizado con el mapa */}
                     <GoogleMaps
                         lat={lat}
                         lng={lng}
                         setLat={setLat}
                         setLng={setLng}
+                        address={direccion}
+                        setAddress={handleMapAddressChange}
                     />
                     <div className="modal-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
                         <button type="submit" className="btn btn-custom-blue" style={{ fontWeight: 600, fontSize: 18 }}>Crear tarea</button>
