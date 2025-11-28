@@ -1,0 +1,73 @@
+.Form {
+  width: 100%;
+  max-width: 600px;
+  min-height: 60vh;
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.Form-login {
+  width: 100%;
+  max-width: 600px;
+  min-height: 60vh;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.50);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+.button {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  background-color: #4f46e5;
+}
+
+h1,
+h2,
+h3,
+p {
+  transition: color 0.5s ease;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.section {
+  transition: background 0.5s ease, color 0.5s ease;
+}
