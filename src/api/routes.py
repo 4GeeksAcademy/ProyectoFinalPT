@@ -5,10 +5,13 @@ from api.models import db, User
 import os
 from flask_mail import Message
 from api.extensions import mail
+from itsdangerous import URLSafeTimedSerializer
+import re
+
 api = Blueprint('api', __name__)
 
 reset_tokens = {}
-url_front = os.getenv("VITE_FRONTEND")
+url_front = os.getenv("VITE_FRONTEND_URL")
 
 
 @api.route('/forgot-password', methods=['POST'])
@@ -20,8 +23,10 @@ def forgot_password():
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({"msg": "Usuario no encontrado o no registrado"}), 404
+    serializer = URLSafeTimedSerializer(os.getenv("MAIL_PASSWORD"))
+    token = serializer.dumps(email, salt="password-reset")
 
-    reset_email = f"{url_front}resetPassword/token"
+    reset_email = f"{url_front}resetPassword/${token}/token"
 
     msg = Message(
         'Recupera contraseña',
@@ -38,17 +43,16 @@ def forgot_password():
 @api.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
-    email = data.get('email')
     token = data.get('token')
     new_password = data.get('new_password')
-    if not email or not token or not new_password:
-        return jsonify({"msg": "Faltan datos"}), 400
-    if reset_tokens.get(email) != token:
-        return jsonify({"msg": "Token inválido"}), 401
+
+    serializer = URLSafeTimedSerializer(os.getenv("MAIL_PASSWORD"))
+
+    email = serializer.loads(token[1:], salt="password-reset", max_age=60)
+
     user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({"msg": "Usuario no encontrado"}), 404
-    user.password = generate_password_hash(new_password)
+    hashed_password = generate_password_hash(new_password)
+    user.password = hashed_password
     db.session.commit()
-    reset_tokens.pop(email)
+
     return jsonify({"msg": "Contraseña cambiada correctamente"}), 200

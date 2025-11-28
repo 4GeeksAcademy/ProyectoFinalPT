@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/Form.css";
 import { Link, useLocation } from "react-router-dom";
 
-const Form = ({ mode, onSubmit, successMessage, userData }) => {
+const Form = ({ mode, onSubmit, successMessage, userData, onForgotPassword }) => {
   const [email, setEmail] = useState(userData?.email || "");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -140,6 +140,16 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                         required
                       />
                     </div>
+                  )}
+
+                  {mode === "login" && (
+                    <p
+                      className="text-end mt-2"
+                      style={{ cursor: "pointer", color: "#0d6efd" }}
+                      onClick={onForgotPassword}
+                    >
+                      ¿Has olvidado la contraseña?
+                    </p>
                   )}
                 </>
               )}

@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Form from "../components/Form.jsx";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import ForgotPasswordModal from "../components/ForgotPasswordModal.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const successMessage = location.state?.successMessage;
   const { dispatch } = useGlobalReducer();
+
+  const [openModal, setOpenModal] = useState(false);
 
   const handleLogin = async ({ email, password, setErrorMsn }) => {
     setErrorMsn(null);
@@ -64,7 +67,21 @@ const Login = () => {
     }
   };
 
-  return <Form mode="login" onSubmit={handleLogin} successMessage={successMessage} />;
+  return (
+    <>
+      <Form
+        mode="login"
+        onSubmit={handleLogin}
+        successMessage={successMessage}
+        onForgotPassword={() => setOpenModal(true)} 
+      />
+
+      <ForgotPasswordModal
+        open={openModal}               
+        onClose={() => setOpenModal(false)}
+      />
+    </>
+  );
 };
 
 export default Login;
