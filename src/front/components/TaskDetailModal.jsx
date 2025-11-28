@@ -19,8 +19,6 @@ function TaskDetailModal({ show, onClose, taskList }) {
                                         <p style={{ color: "#222", marginBottom: 8 }}><strong>Fecha:</strong> {t.date || "Sin fecha"}</p>
                                         <p style={{ color: "#222", marginBottom: 8 }}><strong>Descripción:</strong> {t.description || "Sin descripción"}</p>
                                         <p style={{ color: "#222", marginBottom: 8 }}><strong>Dirección:</strong> {t.address || "Sin dirección"}</p>
-                                        <p style={{ color: "#222", marginBottom: 8 }}><strong>Latitud:</strong> {t.latitude || "-"}</p>
-                                        <p style={{ color: "#222", marginBottom: 8 }}><strong>Longitud:</strong> {t.longitude || "-"}</p>
                                     </div>
                                 </div>
                             ))}

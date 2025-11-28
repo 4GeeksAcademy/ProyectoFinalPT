@@ -70,6 +70,7 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
         const payloadData = {
             title: titulo,
             description: descripcion,
+            address: direccion,
             lat: lat,
             lng: lng,
             estado_id: null,

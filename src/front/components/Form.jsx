@@ -176,12 +176,22 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                 {mode === "login" && "Iniciar Sesión"}
                 {mode === "config" && "Guardar Cambios"}
               </button>
+              {mode === "login" && (
+                <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                  <span
+                    style={{ color: "white", cursor: "pointer", textDecoration: "none" }}
+                    onClick={() => window.location.href = "/forgot-password"}
+                  >
+                    He olvidado mi contraseña
+                  </span>
+                </div>
+              )}
               {mode === "register" ? (
                 <p>
                   ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
                 </p>
               ) : mode === "login" ? (
-                <p>
+                <p style={{ marginTop: "8px" }}>
                   ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
                 </p>
               ) : null}

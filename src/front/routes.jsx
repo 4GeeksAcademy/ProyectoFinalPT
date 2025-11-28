@@ -18,6 +18,7 @@ import { Finances } from "./pages/Finances";
 import { Config } from "./pages/Config"
 import Home from "./pages/Home";
 import { Chat } from "./pages/Chat";
+import RecoveryPassword from "./components/RecoveryPassword";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     // CreateRoutesFromElements function allows you to build route elements declaratively.
@@ -36,6 +37,7 @@ export const router = createBrowserRouter(
       <Route path="/demo" element={<Demo />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<RecoveryPassword />} />
       <Route
         path="/dashboard"
         element={

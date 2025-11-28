@@ -1,13 +1,96 @@
 from flask import request, jsonify, Blueprint
-from datetime import datetime, timedelta, timezone
-from api.models import db, User
-from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
+import os
+import secrets
+from flask_mail import Message
+from api.extensions import mail
 from flask_cors import CORS
+import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
+from api.models import db, User
+from datetime import datetime, timedelta, timezone
+api_user = Blueprint('apiUser', __name__)
+SECRET_KEY = "super-secret-key"
+CORS(api_user)
+
+# Endpoint temporal para ver los tokens activos en desarrollo
+
+
+@api_user.route('/dev-tokens', methods=['GET'])
+def dev_tokens():
+    if os.getenv('FLASK_DEBUG') == '1':
+        return jsonify({"tokens": recovery_tokens}), 200
+    return jsonify({"msg": "No permitido en producción"}), 403
+
+
+# Endpoint temporal para ver los tokens activos en desarrollo
+
+# Endpoint temporal para ver los tokens activos en desarrollo
+
+
+@api_user.route('/dev-tokens', methods=['GET'])
+def dev_tokens():
+    if os.getenv('FLASK_DEBUG') == '1':
+        return jsonify({"tokens": recovery_tokens}), 200
+    return jsonify({"msg": "No permitido en producción"}), 403
+
 
 api_user = Blueprint('apiUser', __name__)
 SECRET_KEY = "super-secret-key"
-CORS (api_user)
+CORS(api_user)
+
+recovery_tokens = {}
+recovery_tokens = {}
+
+
+@api_user.route('/recover-password', methods=['POST'])
+def recover_password():
+    body = request.get_json()
+    email = body.get('email')
+    if not email:
+        return jsonify({"msg": "Email requerido"}), 400
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "No existe usuario con ese email"}), 404
+    token = secrets.token_urlsafe(16)
+    recovery_tokens[email] = token
+    link = f"https://shiny-xylophone-97xjjrww4vrp2766r-3000.app.github.dev/forgot-password?token={token}&email={email}"
+    msg = Message(
+        subject="Recuperación de contraseña",
+        sender="taskflowproyect@gmail.com",
+        recipients=[email],
+        body=f"Recupera tu contraseña aquí: {link}"
+    )
+    try:
+        mail.send(msg)
+
+        return jsonify({"msg": "Email enviado. Revisa tu bandeja de entrada."}), 200
+    except Exception as e:
+
+        return jsonify({"msg": "Error enviando correo", "error": str(e)}), 500
+
+
+@api_user.route('/reset-password', methods=['POST'])
+def reset_password():
+    body = request.get_json()
+    email = body.get('email')
+    token = body.get('token')
+    new_password = body.get('newPassword')
+    confirm_password = body.get('confirmPassword')
+    if not email or not token or not new_password or not confirm_password:
+        return jsonify({"msg": "Faltan datos"}), 400
+    if new_password != confirm_password:
+        return jsonify({"msg": "Las contraseñas no coinciden"}), 400
+    if recovery_tokens.get(email) != token:
+        return jsonify({"msg": "El enlace para cambiar la contraseña ya no es válido. Por favor solicita uno nuevo."}), 400
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    del recovery_tokens[email]
+    return jsonify({"msg": "Contraseña cambiada correctamente"}), 200
+
+
 def token_requerido(f):
     def wrapper(*args, **kwargs):
         if request.method == 'OPTIONS':
@@ -24,9 +107,9 @@ def token_requerido(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
+
 @api_user.route('/register', methods=['POST'])
 def create_profile():
-    print ("hola")
     body = request.get_json()
     email = body.get('email')
     password = body.get('password')
@@ -54,6 +137,7 @@ def create_profile():
     db.session.commit()
     return jsonify({"msg": "Perfil creado correctamente", "perfil": nuevo_perfil.serialize()}), 201
 
+
 @api_user.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -69,6 +153,7 @@ def login():
         'exp': datetime.now(timezone.utc) + timedelta(minutes=15)
     }, SECRET_KEY, algorithm="HS256")
     return jsonify({"token": token, "user": user.serialize()}), 200
+
 
 @api_user.route('/<int:user_id>', methods=['GET'])
 @token_requerido
@@ -132,6 +217,7 @@ def update_user(user_id):
     db.session.commit()
 
     return jsonify({"msg": "Usuario actualizado correctamente", "perfil": user.serialize()}), 200
+
 
 @api_user.route('/Saluda', methods=['POST', 'GET'])
 def handle_hello():

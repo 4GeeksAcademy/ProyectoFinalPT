@@ -1,17 +1,19 @@
-import os
-from flask import Flask, request, jsonify, url_for, send_from_directory
-from flask_migrate import Migrate
-from flask_swagger import swagger
-from api.utils import APIException, generate_sitemap
-from api.models import db
-from api.routes import api
-from api.routesUser import api_user
-from flask_cors import CORS
-from api.admin import setup_admin
-from api.commands import setup_commands
-from api.routesTasks import api_tasks
-from api.extensions import mail
 from flask_mail import Mail
+from api.extensions import mail
+from api.routesTasks import api_tasks
+from api.commands import setup_commands
+from api.admin import setup_admin
+from flask_cors import CORS
+from api.routesUser import api_user
+from api.routes import api
+from api.extensions import db
+from api.utils import APIException, generate_sitemap
+from flask_swagger import swagger
+from flask_migrate import Migrate
+from flask import Flask, request, jsonify, url_for, send_from_directory
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -39,20 +41,22 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config.update(dict(
-    DEBUG=False,
+    DEBUG=True,
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
-    MAIL_USERNAME='taskflowproyect@gmail.com',
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
     MAIL_PASSWORD=os.getenv('MAIL_PASSWORD')
-)),
+))
 
 
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
 
+print("MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
+print("MAIL_PASSWORD =", os.getenv("MAIL_PASSWORD"))
 mail.init_app(app)
 
 setup_admin(app)

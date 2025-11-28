@@ -9,8 +9,6 @@ from werkzeug.security import generate_password_hash
 
 api_tasks = Blueprint('apiTasks', __name__)
 
-# Allow CORS requests to this API
-
 
 @api_tasks.route('/tareas', methods=['GET'])
 def get_tareas():
@@ -27,7 +25,6 @@ def get_tareas():
 @api_tasks.route('/<int:user_id>/tareas', methods=['GET'])
 def get_tareas_user(user_id):
     varUser = User.query.get(user_id)
-    print(varUser)
     if varUser is None:
         return ({'msg': f'El usuario con ID {user_id} no existe'}), 404
     varTareas_lista = varUser.db_tareas_asignadas_user
@@ -70,6 +67,7 @@ def agregar_tarea_user(user_id):
 
     title = data.get("title")
     description = data.get("description")
+    address = data.get("address")
     lat = data.get("lat")
     lng = data.get("lng")
     estado_id = data.get("estado_id")
@@ -82,6 +80,7 @@ def agregar_tarea_user(user_id):
     nueva_tarea = Task(
         title=title,
         description=description,
+        address=address,
         lat=lat,
         lng=lng,
         estado_id=estado_id,
@@ -124,6 +123,8 @@ def editar_tarea_user(user_id, tareas_id):
         varTarea.title = body["title"]
     if "description" in body:
         varTarea.description = body["description"]
+    if "address" in body:
+        varTarea.address = body["address"]
     if "date" in body:
         try:
             varTarea.date = datetime.fromisoformat(body["date"])
