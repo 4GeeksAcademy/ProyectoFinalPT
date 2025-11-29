@@ -23,20 +23,20 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="footer mt-auto py-5 bg-dark text-light">
+    <footer className="footer mt-auto py-5">
       <div className="container">
         <div className="row text-center">
 
           <div className="col-md-4 mb-4 d-flex flex-column align-items-center">
             <button 
-              className="btn btn-link text-light d-flex flex-column align-items-center gap-2"
+              className="btn btn-link text-dark d-flex flex-column align-items-center gap-2"
               onClick={() => toggleSection("info")}
             >
               <FaInfoCircle size={24} />
               <span className="fw-bold">TaskFlow</span>
             </button>
             {openSection === "info" && (
-              <p className="mt-2 text-center">
+              <p className="mt-2 text-dark text-center">
                 TaskFlow es una herramienta diseñada para ayudarte a organizar tus tareas,
                 mejorar tu enfoque y mantener un flujo constante hacia tus objetivos,
                 sean personales, académicos o profesionales.
@@ -46,14 +46,14 @@ export const Footer = () => {
 
           <div className="col-md-4 mb-4 d-flex flex-column align-items-center">
             <button 
-              className="btn btn-link text-light d-flex flex-column align-items-center gap-2"
+              className="btn btn-link text-dark d-flex flex-column align-items-center gap-2"
               onClick={() => toggleSection("contact")}
             >
               <FaEnvelope size={24} />
               <span className="fw-bold">Contacto</span>
             </button>
             {openSection === "contact" && (
-              <div className="mt-2 text-center">
+              <div className="mt-2 text-dark text-center">
                 <p className="mb-1">Correo de soporte:</p>
                 <p className="fw-semibold">taskflowproyect@gmail.com</p>
                 <p className="text-secondary small">
@@ -65,7 +65,7 @@ export const Footer = () => {
 
           <div className="col-md-4 mb-4 d-flex flex-column align-items-center">
             <button 
-              className="btn btn-link text-light d-flex flex-column align-items-center gap-2"
+              className="btn btn-link text-dark d-flex flex-column align-items-center gap-2"
               onClick={() => {
                 generarFrase();
                 toggleSection("frase");
@@ -75,13 +75,13 @@ export const Footer = () => {
               <span className="fw-bold">Frase del día</span>
             </button>
             {openSection === "frase" && frase && (
-              <h5 className="mt-3 fst-italic text-center">{frase}</h5>
+              <h5 className="mt-3 fst-italic text-dark text-center">{frase}</h5>
             )}
           </div>
 
         </div>
 
-        <div className="border-top border-secondary pt-3 mt-4 text-center small opacity-75">
+        <div className="border-top border-secondary text-dark pt-3 mt-4 text-center small opacity-75">
           © 2025 TaskFlow — Acompañando tu organización diaria.
         </div>
       </div>
