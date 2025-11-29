@@ -1,5 +1,8 @@
 body {
-  background: #3B6CB7;
-  background: -webkit-linear-gradient(to right, #3B6CB7, #A17AD8);
-  background: linear-gradient(to right, #3B6CB7, #A17AD8);
+  background: #3b6cb7;
+  background: -webkit-linear-gradient(to right, #3b6cb7, #a17ad8);
+  background: linear-gradient(to right, #3b6cb7, #a17ad8);
+}
+.footer {
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
