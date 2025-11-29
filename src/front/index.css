@@ -1,13 +1,5 @@
 body {
-  background: #1e3c72; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #1e5bcb,
-    #788499
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to right,
-    #1e3c72,
-    #2a5298
-  ); /
+  background: #3B6CB7;
+  background: -webkit-linear-gradient(to right, #3B6CB7, #A17AD8);
+  background: linear-gradient(to right, #3B6CB7, #A17AD8);
 }

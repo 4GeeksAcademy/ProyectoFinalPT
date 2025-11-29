@@ -25,6 +25,72 @@
   flex-direction: column;
   justify-content: center;
 }
+.Form-config {
+  max-width: 800px;
+  width: 100%;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.Form-config h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.Form-config .form-label {
+  font-weight: 600;
+  color: #444;
+}
+
+.Form-config .form-control {
+  border-radius: 8px;
+  padding: 0.75rem;
+  border: 1px solid #bbb;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.Form-config .form-control:focus {
+  border-color: #6e8efb;
+  box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.25);
+}
+
+.Form-config .button {
+  background: #6e8efb;
+  border-radius: 12px;
+  padding: 0.8rem;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  transition: 0.25s;
+}
+
+.Form-config .button:hover {
+  background: #5676e8;
+}
+
+/* Cancel button */
+.Form-config .btn-danger {
+  background: #d9534f !important;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 
 .button {

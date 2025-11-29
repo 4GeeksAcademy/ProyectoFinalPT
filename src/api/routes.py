@@ -11,7 +11,7 @@ import re
 api = Blueprint('api', __name__)
 
 reset_tokens = {}
-url_front = os.getenv("VITE_FRONTEND")
+url_front = os.getenv("VITE_FRONTEND_URL")
 
 
 @api.route('/forgot-password', methods=['POST'])

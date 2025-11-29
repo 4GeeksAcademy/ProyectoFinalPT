@@ -18,6 +18,7 @@ import { Finances } from "./pages/Finances";
 import { Config } from "./pages/Config"
 import Home from "./pages/Home";
 import { Chat } from "./pages/Chat";
+import ResetPassword from "./pages/ResetPassword";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -80,7 +81,7 @@ export const router = createBrowserRouter(
           }
         />
       </Route>
-      <Route path="/resetPassword/:token*" element={<Login />} />
+      <Route path="/resetPassword/:token*" element={<ResetPassword />} />
 
     </>
 

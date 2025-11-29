@@ -244,7 +244,6 @@ body {
     background: transparent;
     color: white; 
 }
-/* Sidebar */
 .dashboard-sidebar {
     width: 260px;
     background-color: rgba(255, 255, 255, 0.9);
@@ -254,13 +253,16 @@ body {
     border-right: 1px solid rgba(255, 255, 255, 0.3);
     padding: 20px;
     display: flex;
-    flex-direction: column;
-    position: sticky; 
+    position: sticky;
     top: 0;
-    left: 0;
     height: 100vh;
+    flex-direction: column;
+    min-height: 100vh; /* asegura que llegue hasta abajo */
     z-index: 1000; 
+    transition: width 0.3s ease;
 }
+
+/* Header */
 .sidebar-header {
     text-align: center;
     margin-bottom: 30px;
@@ -272,57 +274,38 @@ body {
     letter-spacing: 1px;
     text-decoration: none;
 }
+
+/* User Profile */
 .user-profile-summary {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 15px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
 }
 .user-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #6366f1;
-  margin-bottom: 10px;
-  background: #6366f1;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #6366f1;
+    margin-bottom: 10px;
+    background: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
 }
 .user-avatar img {
-  width: 100%;
-  height: 100%;
-}
-.user-profile-summary {
-  
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 15px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-}
-.user-avatar {
-margin: 0 auto;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #6366f1;
-  margin-bottom: 10px;
-  background: #6366f1;
-  color: white;
-}
-.user-avatar img {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 }
 .user-avatar span {
-  font-size: 3rem;
+    font-size: 3rem;
 }
 .username {
     display: block;
@@ -334,22 +317,24 @@ margin: 0 auto;
     font-size: 0.85rem;
     color: #555555; 
 }
+
+/* Navigation */
 .sidebar-nav ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 .sidebar-nav li {
     margin-bottom: 10px;
 }
 .sidebar-nav a {
-    display: block;
+    display: flex;
+    align-items: center;
     padding: 12px 15px;
     color: #555555; 
     text-decoration: none;
     border-radius: 8px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    display: flex;
-    align-items: center;
 }
 .sidebar-nav a:hover {
     background-color: rgba(99, 102, 241, 0.1);
@@ -363,8 +348,36 @@ margin: 0 auto;
 }
 .sidebar-nav a i {
     font-size: 1rem;
-    width: 25px; 
-    margin-right: 5px;
+    width: 25px;
+    margin-right: 10px;
+}
+
+/* Responsive: colapsar en pantallas pequeñas */
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        width: 60px; /* ancho colapsado */
+        padding: 10px 0;
+    }
+
+    .sidebar-header,
+    .user-profile-summary,
+    .sidebar-nav a span {
+        display: none; /* oculta texto y avatar */
+    }
+
+    .sidebar-nav a {
+        justify-content: center;
+        padding: 12px 0;
+        border-radius: 50%; /* icono redondo */
+        margin: 5px auto;
+        width: 40px;
+        height: 40px;
+    }
+
+    .sidebar-nav a i {
+        margin: 0;
+        font-size: 1.2rem;
+    }
 }
 
 /* Contenido Principal del Dashboard */
@@ -691,4 +704,121 @@ calendar-month::part(range-inner) {
 
 calendar-month::part(button) {
   border-radius: 3px;
+}
+.footer{
+    background-color: white;
+}
+.page-container {
+    padding: 2rem;
+    color: white;
+    font-family: Arial, sans-serif;
+    min-height: calc(100vh - 56px);
+}
+
+.main-box {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #333333;
+}
+
+.main-box h2 {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 10px;
+    font-weight: bold;
+    color: #333333;
+}
+
+.clans-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+}
+
+.clans-table {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    overflow: hidden;
+    color: #333333;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.clans-table th, .clans-table td {
+    background-color: transparent !important;
+    color: #333333 !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    vertical-align: middle;
+}
+
+.clans-table th {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.clans-table tr.active-clan {
+    background-color: rgba(99, 102, 241, 0.2) !important;
+    border-left: 4px solid #6366F1;
+}
+
+.responsive-button-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.responsive-button-group .btn {
+    flex: 1;
+}
+
+.modal-content-dark {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333333;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.modal-content-dark .modal-header,
+.modal-content-dark .modal-footer {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.modal-content-dark .form-control {
+    background-color: #F0F0F0;
+    color: #333333;
+    border: 1px solid #CCC;
+}
+
+.modal-content-dark .form-control:focus {
+    background-color: #FFF;
+    color: #333333;
+    border-color: #6366F1;
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+}
+
+.modal-content-dark .form-label {
+    color: #333333;
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+    }
+    .main-box h2 {
+        font-size: 1.5rem;
+    }
+    .responsive-button-group {
+        flex-direction: column;
+    }
+    .responsive-button-group .btn {
+        width: 100%;
+    }
+    .clans-table-wrapper .table {
+        min-width: 600px;
+    }
 }

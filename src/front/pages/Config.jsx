@@ -72,14 +72,15 @@ export const Config = () => {
   };
 
   return (
-    <div className="d-flex">
-      <div><Sidebar/></div>
-      <div className="">
+    <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <Sidebar />
+      <div className="container d-flex justify-content-center align-items-center w-100">
         <Form
           mode="config"
           userData={userData}
           onSubmit={handleConfigSubmit}
           successMessage={successMsn}
+          className="Form-config"
         />
       </div>
     </div>

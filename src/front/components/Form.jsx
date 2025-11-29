@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/Form.css";
 import { Link, useLocation } from "react-router-dom";
 
-
-const Form = ({ mode, onSubmit, successMessage, userData }) => {
+const Form = ({ mode, onSubmit, successMessage, userData, onForgotPassword }) => {
   const [email, setEmail] = useState(userData?.email || "");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +11,7 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [errorMsn, setErrorMsn] = useState(null);
-  const location = useLocation()
+  const location = useLocation();
 
   useEffect(() => {
     if (successMessage) setErrorMsn(successMessage);
@@ -24,14 +23,17 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (mode === "register" && password !== confirmPassword) {
       setErrorMsn("Las contraseñas no coinciden");
       return;
     }
+
     if (mode === "config" && newPassword && newPassword !== confirmNewPassword) {
       setErrorMsn("Las nuevas contraseñas no coinciden");
       return;
     }
+
     try {
       if (mode === "config") {
         await onSubmit({ newEmail, newPassword, setErrorMsn });
@@ -39,19 +41,18 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
         setConfirmPassword("");
         setNewPassword("");
         setConfirmNewPassword("");
-        setName("")
+        setName("");
       } else {
         if (mode === "register") {
           await onSubmit({ email, password, name, setErrorMsn });
-
         } else {
           await onSubmit({ email, password, setErrorMsn });
-
         }
+
         setEmail("");
         setPassword("");
         setConfirmPassword("");
-        setName("")
+        setName("");
       }
     } catch (error) {
       setErrorMsn(error.message || "Error");
@@ -70,34 +71,37 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
             />
           </div>
         )}
+
         <div className={`col-12 ${mode !== "config" ? "col-lg-6 d-flex align-items-center justify-content-center py-5 px-4" : "d-flex justify-content-center"}`}>
-          <div className="Form-login">
+          
+          <div className={`Form-login ${mode === "config" ? "Form-config" : ""}`}>
             <h1 className="mb-4 text-center">
               {mode === "register" && "Registrarse"}
               {mode === "login" && "Iniciar Sesión"}
               {mode === "config" && "Configuración"}
             </h1>
+
             {errorMsn && (
               <div className={`alert alert-${successMessage === errorMsn ? "success" : "danger"}`}>
                 {errorMsn}
               </div>
             )}
+
             <form onSubmit={handleSubmit}>
-              {
-                mode === "register" && (
-                  <div className="mb-3">
-                    <label htmlFor="name" className="form-label">Nombre</label>
-                    <input
-                      type="name"
-                      className="form-control"
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-                )
-              }
+              {mode === "register" && (
+                <div className="mb-3">
+                  <label htmlFor="name" className="form-label">Nombre</label>
+                  <input
+                    type="name"
+                    className="form-control"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+
               {(mode === "register" || mode === "login") && (
                 <>
                   <div className="mb-3">
@@ -111,6 +115,7 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                       required
                     />
                   </div>
+
                   <div className="mb-3">
                     <label htmlFor="password" className="form-label">Contraseña</label>
                     <input
@@ -122,6 +127,7 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                       required
                     />
                   </div>
+
                   {mode === "register" && (
                     <div className="mb-3">
                       <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
@@ -135,14 +141,26 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                       />
                     </div>
                   )}
+
+                  {mode === "login" && (
+                    <p
+                      className="text-end mt-2"
+                      style={{ cursor: "pointer", color: "#0d6efd" }}
+                      onClick={onForgotPassword}
+                    >
+                      ¿Has olvidado la contraseña?
+                    </p>
+                  )}
                 </>
               )}
+
               {mode === "config" && (
                 <>
                   <div className="mb-3">
                     <label className="form-label">Email</label>
                     <input type="email" className="form-control mb-2" value={email} readOnly />
                   </div>
+
                   <div className="mb-3">
                     <label className="form-label">Modificar Email</label>
                     <input
@@ -152,6 +170,7 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                       onChange={(e) => setNewEmail(e.target.value)}
                     />
                   </div>
+
                   <div className="mb-3">
                     <label className="form-label">Modificar Contraseña</label>
                     <input
@@ -171,11 +190,13 @@ const Form = ({ mode, onSubmit, successMessage, userData }) => {
                   </div>
                 </>
               )}
+
               <button type="submit" className="button w-100 mb-3">
                 {mode === "register" && "Registrarse"}
                 {mode === "login" && "Iniciar Sesión"}
                 {mode === "config" && "Guardar Cambios"}
               </button>
+
               {mode === "register" ? (
                 <p>
                   ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
