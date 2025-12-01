@@ -158,7 +158,7 @@ export const Finances = () => {
                 {/* --- INICIO: SECCIÓN FINANZAS DEL CLAN --- */}
                 {!activeClanId ? (
                     <div className="main-box text-center">
-                        <p className="lead text-muted mt-4">Selecciona un clan en la página de "Grupos" para ver sus finanzas.</p>
+                        <p className="lead text-muted mt-4">Selecciona un clan en la página de "Tus clanes" para ver sus finanzas.</p>
                     </div>
                 ) : (
                     <div className="main-box">
