@@ -52,6 +52,7 @@ class Task(db.Model):
     description: Mapped[str] = mapped_column(String(250), nullable=True)
     lat: Mapped[str] = mapped_column(String(255), nullable=True)
     lng: Mapped[str] = mapped_column(String(255), nullable=True)
+    address: Mapped[str] = mapped_column(String(255), nullable=True)
     estado_id: Mapped[int] = mapped_column(ForeignKey('estado.id'), nullable=True)
     db_estado_tareas: Mapped['Estado'] = relationship(back_populates='db_tareas_estado')
     evento_id: Mapped[int] = mapped_column(ForeignKey('evento.id'), nullable=True)
@@ -71,7 +72,8 @@ class Task(db.Model):
             "date": self.date,
             "description": self.description,
             "lat": self.lat,
-            "lng": self.lng
+            "lng": self.lng,
+            "address": self.address,
         }
 
 

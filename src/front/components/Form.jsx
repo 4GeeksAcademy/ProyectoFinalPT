@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/Form.css";
 import { Link, useLocation } from "react-router-dom";
 
-const Form = ({ mode, onSubmit, successMessage, userData, onForgotPassword }) => {
+const Form = ({ mode, onSubmit, successMessage, userData, onForgotPassword, onLogout }) => {
   const [email, setEmail] = useState(userData?.email || "");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -73,7 +73,6 @@ const Form = ({ mode, onSubmit, successMessage, userData, onForgotPassword }) =>
         )}
 
         <div className={`col-12 ${mode !== "config" ? "col-lg-6 d-flex align-items-center justify-content-center py-5 px-4" : "d-flex justify-content-center"}`}>
-          
           <div className={`Form-login ${mode === "config" ? "Form-config" : ""}`}>
             <h1 className="mb-4 text-center">
               {mode === "register" && "Registrarse"}
@@ -208,9 +207,18 @@ const Form = ({ mode, onSubmit, successMessage, userData, onForgotPassword }) =>
               ) : null}
 
               {mode === "config" && (
-                <Link to="/dashboard" className="btn btn-danger w-100 mb-3">
-                  Cancelar
-                </Link>
+                <>
+                  <Link to="/dashboard" className="btn btn-danger w-100 mb-3">
+                    Cancelar
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn btn-warning w-100"
+                    onClick={onLogout}
+                  >
+                    Cerrar sesión
+                  </button>
+                </>
               )}
             </form>
           </div>
