@@ -42,7 +42,7 @@ export const Sidebar = () => {
           <li>
             <NavLink to="/groups" className={({ isActive }) => isActive ? "active" : ""}>
               <i className="fas fa-users"></i>
-              <span className="nav-text">Tus Clanes</span>
+              <span className="nav-text">Grupos</span>
             </NavLink>
           </li>
           <li>
