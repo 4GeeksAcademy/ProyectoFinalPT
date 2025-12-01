@@ -52,6 +52,12 @@ export const Sidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/chat" className={({ isActive }) => isActive ? "active" : ""}>
+              <i className="fas fa-comments"></i>
+              <span className="nav-text">Chat</span>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/profile" className={({ isActive }) => isActive ? "active" : ""}>
               <i className="fas fa-user-circle"></i>
               <span className="nav-text">Tu Perfil</span>
@@ -63,12 +69,7 @@ export const Sidebar = () => {
               <span className="nav-text">Configuración</span>
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/chat" className={({ isActive }) => isActive ? "active" : ""}>
-              <i className="fas fa-comments"></i>
-              <span className="nav-text">Chat</span>
-            </NavLink>
-          </li>
+
         </ul>
       </nav>
     </div>
