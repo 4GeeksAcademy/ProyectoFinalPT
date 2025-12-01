@@ -235,7 +235,7 @@ export const Profile = () => {
 
                                 <div className="col-md-6 profile-grid-item">
                                     <div className="detail-box text-center d-flex flex-column justify-content-center align-items-center" style={{ height: '100%' }}>
-                                        <h4 className="text-muted mb-3">Gastos del Mes</h4>
+                                        <h4 className="mb-3">Gastos del Mes</h4>
                                         <i className="fas fa-chart-line fa-3x mb-2 text-danger"></i>
                                         <h2 className="display-5 fw-bold text-danger">{totalExpenses.toFixed(2)}€</h2>
                                         <Link to="/finances" className="btn btn-sm btn-outline-danger mt-2">Ver Detalles</Link>

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import Form from "../components/Form.jsx";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Sidebar } from "../components/Sidebar";
-import { div } from "framer-motion/m";
-
 
 export const Config = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -71,6 +69,12 @@ export const Config = () => {
     }
   };
 
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+    // redirige al login si quieres
+    window.location.href = "/login";
+  };
+
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
       <Sidebar />
@@ -80,6 +84,7 @@ export const Config = () => {
           userData={userData}
           onSubmit={handleConfigSubmit}
           successMessage={successMsn}
+          onLogout={handleLogout}
           className="Form-config"
         />
       </div>

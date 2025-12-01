@@ -6,30 +6,34 @@ import ModalCreateTask from "../components/ModalCreateTask";
 import TaskDetailModal from "../components/TaskDetailModal";
 import { Sidebar } from "../components/Sidebar";
 
-
-
-// --- ACTUALIZADO: TaskListItem ahora recibe onEdit ---
 const TaskListItem = ({ task, onToggle, onDelete, onEdit, onClick }) => (
-    <li className="list-group-item d-flex justify-content-between align-items-center task-list-item"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
-        onClick={typeof onClick === 'function' ? onClick : undefined}
+    <li
+        className="list-group-item d-flex justify-content-between align-items-center task-list-item"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+        onClick={onClick}
     >
         <span
-            className={`task-text ${task.completed ? 'completed' : ''}`}
-            style={{ cursor: "pointer", color: task.completed ? '#888' : '#333' }}
+            className={`task-text ${task.completed ? "completed" : ""}`}
+            style={{ cursor: "pointer", color: task.completed ? "#888" : "#333" }}
         >
             {task.title}
         </span>
         <div>
             <i
                 className="fas fa-pencil-alt text-primary ms-2"
-                onClick={e => { e.stopPropagation(); onEdit(task); }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(task);
+                }}
                 style={{ cursor: "pointer", marginRight: "10px" }}
                 title="Editar"
             ></i>
             <i
                 className="fas fa-trash text-danger ms-2"
-                onClick={e => { e.stopPropagation(); onDelete(task.id); }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(task.id);
+                }}
                 style={{ cursor: "pointer" }}
                 title="Eliminar"
             ></i>
@@ -41,20 +45,19 @@ export const Dashboard = () => {
     const { store, dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
-    // --- TRAE LA INFORMACION DE LA BASE DE DATOS Y LA GUARDA EN EL STORE ---
     useEffect(() => {
         const cargarDatos = async () => {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
                 const response = await fetch(
-                    `${backendUrl}/api/users/${store.user.id}/tareas`, 
+                    `${backendUrl}/api/users/${store.user.id}/tareas`,
                     {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${store.token}`
-                        }
+                            Authorization: `Bearer ${store.token}`,
+                        },
                     }
                 );
 
@@ -73,10 +76,9 @@ export const Dashboard = () => {
                         userTasks: data["Lista de todas las Tareas del usario"],
                         clans: store.clans,
                         clanTasks: [],
-                        token: store.token
-                    }
+                        token: store.token,
+                    },
                 });
-
             } catch (error) {
                 console.error("Error conectando con backend:", error);
             }
@@ -87,46 +89,49 @@ export const Dashboard = () => {
 
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [taskType, setTaskType] = useState("user");
-
-    // --- NUEVO ESTADO: Tarea a editar ---
     const [taskToEdit, setTaskToEdit] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [taskToShow, setTaskToShow] = useState(null);
 
     const pendingUserTasks = store.userTasks;
-    const activeClan = store.clans.find(c => c.id === store.activeClanId);
+    const activeClan = store.clans.find((c) => c.id === store.activeClanId);
     const activeClanTasks = store.clanTasks;
 
     const totalPersonalExpenses = store.personalExpenses.reduce((sum, e) => sum + e.amount, 0);
     const totalClanExpenses = store.expenses.reduce((sum, e) => sum + e.amount, 0);
     const totalExpenses = totalPersonalExpenses + totalClanExpenses;
 
-    // --- FUNCIÓN ABRIR MODAL DE CREAR ---
     const openCreateModal = (type) => {
+        if (type === "clan" && !store.activeClanId) {
+            alert("Debes seleccionar un grupo antes de crear una tarea del clan.");
+            return;
+        }
+
         setTaskType(type);
-        setTaskToEdit(null); // Limpiamos para que sea creación
+        setTaskToEdit(null);
         setShowTaskModal(true);
     };
 
-    // --- FUNCIÓN ABRIR MODAL DE EDITAR ---
     const openEditModal = (task, type) => {
         setTaskType(type);
-        setTaskToEdit(task); // Cargamos la tarea a editar
+        setTaskToEdit(task);
         setShowTaskModal(true);
     };
 
-    const toggleUserTask = (taskId) => dispatch({ type: 'TOGGLE_USER_TASK', payload: { taskId } });
-    
+    const toggleUserTask = (taskId) =>
+        dispatch({ type: "TOGGLE_USER_TASK", payload: { taskId } });
+
     const deleteUserTask = async (taskId) => {
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
             const response = await fetch(
-                `${backendUrl}/api/users/${store.user.id}/tareas/${taskId}/eliminar`, 
+                `${backendUrl}/api/users/${store.user.id}/tareas/${taskId}/eliminar`,
                 {
                     method: "DELETE",
                     headers: {
-                        "Authorization": `Bearer ${store.token}`
-                    }
+                        Authorization: `Bearer ${store.token}`,
+                    },
                 }
             );
 
@@ -138,41 +143,44 @@ export const Dashboard = () => {
             }
 
             dispatch({ type: "DELETE_USER_TASK", payload: { taskId } });
-
         } catch (err) {
             console.error("Error eliminando tarea", err);
         }
     };
 
-    const toggleClanTask = (taskId) => dispatch({ type: 'TOGGLE_CLAN_TASK', payload: { taskId } });
-    const deleteClanTask = (taskId) => dispatch({ type: 'DELETE_CLAN_TASK', payload: { taskId } });
+    const toggleClanTask = (taskId) =>
+        dispatch({ type: "TOGGLE_CLAN_TASK", payload: { taskId } });
 
-    const handleShowDetailModal = () => {
+    const deleteClanTask = (taskId) =>
+        dispatch({ type: "DELETE_CLAN_TASK", payload: { taskId } });
+
+    const handleShowDetailModal = (task) => {
+        setTaskToShow(task);
         setShowDetailModal(true);
     };
 
     return (
         <div className="dashboard-container">
-            <TaskDetailModal show={showDetailModal} onClose={() => setShowDetailModal(false)} taskList={pendingUserTasks} />
+            <TaskDetailModal
+                show={showDetailModal}
+                onClose={() => setShowDetailModal(false)}
+                task={taskToShow}
+            />
 
             {showTaskModal && (
                 <ModalCreateTask
                     setShowTaskModal={setShowTaskModal}
                     taskType={taskType}
-                    taskToEdit={taskToEdit} // Pasamos la tarea (o null)
+                    taskToEdit={taskToEdit}
                 />
             )}
-            {(showTaskModal) && <div className="modal-backdrop fade show"></div>}
+            {showTaskModal && <div className="modal-backdrop fade show"></div>}
 
             {showDetailModal && (
-                <TaskDetailModal
-                    showDetailModal={showDetailModal}
-                    setShowDetailModal={setShowDetailModal}
-                />
+                <div className="modal-backdrop fade show"></div>
             )}
-            {(showDetailModal) && <div className="modal-backdrop fade show"></div>}
 
-           <Sidebar></Sidebar>
+            <Sidebar />
 
             <div className="dashboard-main-content">
                 <div className="dashboard-content-area page-container">
@@ -181,64 +189,78 @@ export const Dashboard = () => {
                     </div>
 
                     <div className="row g-4 dashboard-cards">
-
-                        {/* Tareas Pendientes */}
                         <div className="col-lg-6">
                             <div className="dashboard-card">
                                 <div className="card-header-actions">
                                     <h3>Tus Tareas Pendientes</h3>
-                                    <button className="btn btn-sm btn-icon-only" onClick={() => openCreateModal('user')}>
+                                    <button
+                                        className="btn btn-sm btn-icon-only"
+                                        onClick={() => openCreateModal("user")}
+                                    >
                                         <i className="fas fa-plus"></i>
                                     </button>
                                 </div>
                                 <ul className="list-group list-group-flush task-list">
                                     {pendingUserTasks.length > 0 ? (
-                                        pendingUserTasks.map(task => (
+                                        pendingUserTasks.map((task) => (
                                             <TaskListItem
                                                 key={task.id}
                                                 task={task}
                                                 onToggle={toggleUserTask}
                                                 onDelete={deleteUserTask}
-                                                onEdit={(t) => openEditModal(t, 'user')}
-                                                onClick={handleShowDetailModal}
+                                                onEdit={(t) => openEditModal(t, "user")}
+                                                onClick={() => handleShowDetailModal(task)}
                                             />
                                         ))
                                     ) : (
-                                        <p className="text-muted text-center mt-3">No hay tareas pendientes.</p>
+                                        <p className="text-muted text-center mt-3">
+                                            No hay tareas pendientes.
+                                        </p>
                                     )}
                                 </ul>
                             </div>
                         </div>
 
-                        {/* Tareas de Clanes */}
                         <div className="col-lg-6">
                             <div className="dashboard-card">
                                 <div className="card-header-actions">
                                     <h3>Tareas de Clanes</h3>
-                                    <button className="btn btn-sm btn-icon-only" onClick={() => openCreateModal('clan')}>
+                                    <button
+                                        className="btn btn-sm btn-icon-only"
+                                        onClick={() => openCreateModal("clan")}
+                                        disabled={!store.activeClanId}
+                                    >
                                         <i className="fas fa-plus"></i>
                                     </button>
                                 </div>
-                                {activeClan && <p className="text-muted" style={{ marginTop: '-10px' }}>Para: <strong>{activeClan.name}</strong></p>}
+
+                                {activeClan && (
+                                    <p className="text-muted" style={{ marginTop: "-10px" }}>
+                                        Para: <strong>{activeClan.name}</strong>
+                                    </p>
+                                )}
+
                                 <ul className="list-group list-group-flush task-list">
                                     {activeClanTasks.length > 0 ? (
-                                        activeClanTasks.map(task => (
+                                        activeClanTasks.map((task) => (
                                             <TaskListItem
                                                 key={task.id}
                                                 task={task}
                                                 onToggle={toggleClanTask}
                                                 onDelete={deleteClanTask}
-                                                onEdit={(t) => openEditModal(t, 'clan')} // <-- Pasamos el handler
+                                                onEdit={(t) => openEditModal(t, 'clan')}
+                                                onClick={() => handleShowDetailModal(task)}
                                             />
                                         ))
                                     ) : (
-                                        <p className="text-muted text-center mt-3">No hay tareas de clan.</p>
+                                        <p className="text-muted text-center mt-3">
+                                            No hay tareas de clan.
+                                        </p>
                                     )}
                                 </ul>
                             </div>
                         </div>
 
-                        {/* Resumen Financiero */}
                         <div className="col-lg-12">
                             <div className="dashboard-card">
                                 <h3 className="mb-0">Resumen Financiero</h3>
@@ -246,15 +268,22 @@ export const Dashboard = () => {
                                     <div className="col-md-6 text-center border-end">
                                         <h4 className="text-muted">Saldo del Bote</h4>
                                         <div className="my-3">
-                                            <i className="fas fa-coins fa-3x mb-2" style={{ color: '#FFD700' }}></i>
-                                            <h2 className="display-4 fw-bold text-info">{store.personalBote.toFixed(2)}€</h2>
+                                            <i
+                                                className="fas fa-coins fa-3x mb-2"
+                                                style={{ color: "#FFD700" }}
+                                            ></i>
+                                            <h2 className="display-4 fw-bold text-info">
+                                                {store.personalBote.toFixed(2)}€
+                                            </h2>
                                         </div>
                                     </div>
                                     <div className="col-md-6 text-center">
                                         <h4 className="text-muted">Gastos del Mes</h4>
                                         <div className="my-3">
                                             <i className="fas fa-chart-line fa-3x mb-2 text-danger"></i>
-                                            <h2 className="display-4 fw-bold text-danger">{totalExpenses.toFixed(2)}€</h2>
+                                            <h2 className="display-4 fw-bold text-danger">
+                                                {totalExpenses.toFixed(2)}€
+                                            </h2>
                                         </div>
                                     </div>
                                 </div>
@@ -264,8 +293,12 @@ export const Dashboard = () => {
                         <div className="col-12">
                             <div className="dashboard-card text-center">
                                 <h3>Mensajes Recientes</h3>
-                                <h1 className="display-1 my-4 text-info"><i className="fas fa-comment-dots"></i></h1>
-                                <p className="text-muted">Próximamente verás tus chats aquí.</p>
+                                <h1 className="display-1 my-4 text-info">
+                                    <i className="fas fa-comment-dots"></i>
+                                </h1>
+                                <p className="text-muted">
+                                    Próximamente verás tus chats aquí.
+                                </p>
                             </div>
                         </div>
                     </div>
