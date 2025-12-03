@@ -35,7 +35,7 @@ def forgot_password():
         sender='taskflowproyect@gmail.com'
     )
 
-    mail.send(msg)
+    #mail.send(msg)
 
     return jsonify({"msg": "Correo enviado exitosamente"}), 200
 
