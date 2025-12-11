@@ -81,7 +81,7 @@ export const router = createBrowserRouter(
           }
         />
       </Route>
-      <Route path="/resetPassword/:token*" element={<ResetPassword />} />
+      <Route path="/resetPassword/:token/*" element={<ResetPassword />} />
 
     </>
 

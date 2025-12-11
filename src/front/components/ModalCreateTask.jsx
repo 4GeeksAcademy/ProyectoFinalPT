@@ -12,6 +12,7 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
         : (taskType === "user" ? "Nueva Tarea Personal" : "Nueva Tarea de Clan");
 
     const [titulo, setTitulo] = useState("");
+    const [fecha, setFecha] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [direccion, setDireccion] = useState("");
     const [lat, setLat] = useState("");
@@ -21,12 +22,14 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
     useEffect(() => {
         if (taskToEdit) {
             setTitulo(taskToEdit.title || "");
+            setFecha(taskToEdit.date || "");
             setDescripcion(taskToEdit.description || "");
             setDireccion(taskToEdit.address || "");
             setLat(taskToEdit.lat || "");
             setLng(taskToEdit.lng || "");
         } else {
             setTitulo("");
+            setFecha("");
             setDescripcion("");
             setDireccion("");
             setLat("");
@@ -47,6 +50,7 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
                 id: isEditing ? taskToEdit.id : crypto.randomUUID(),
                 clanId: activeClanId,
                 title: titulo,
+                date: fecha,
                 description: descripcion,
                 address: direccion,
                 lat: lat,
@@ -68,6 +72,7 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
 
         const payloadData = {
             title: titulo,
+            date: fecha,
             description: descripcion,
             address: direccion,
             lat: lat,
@@ -145,11 +150,28 @@ function ModalCreateTask({ setShowTaskModal, taskType, taskToEdit = null }) {
                         <button type="button" className="btn-close btn-close-white" onClick={() => setShowTaskModal(false)} />
                     </div>
 
+
                     <input
                         placeholder="Título"
                         value={titulo}
                         onChange={e => setTitulo(e.target.value)}
                         style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }}
+                    />
+
+                    <input
+                        placeholder="Fecha (dd/mm/aaaa)"
+                        value={fecha}
+                        onChange={e => {
+                            let v = e.target.value.replace(/[^\d]/g, "");
+                            if (v.length > 2 && v[2] !== '/') v = v.slice(0, 2) + '/' + v.slice(2);
+                            if (v.length > 5 && v[5] !== '/') v = v.slice(0, 5) + '/' + v.slice(5);
+                            if (v.length > 10) v = v.slice(0, 10);
+                            setFecha(v);
+                        }}
+                        maxLength={10}
+                        style={{ width: "100%", marginBottom: 12, border: "1px solid #1e91ed", borderRadius: 8, padding: 10 }}
+                        pattern="\d{2}/\d{2}/\d{4}"
+                        required
                     />
 
                     <textarea

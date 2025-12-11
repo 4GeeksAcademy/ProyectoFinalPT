@@ -25,18 +25,14 @@ def forgot_password():
         return jsonify({"msg": "Usuario no encontrado o no registrado"}), 404
     serializer = URLSafeTimedSerializer(os.getenv("MAIL_PASSWORD"))
     token = serializer.dumps(email, salt="password-reset")
-
-    reset_email = f"{url_front}resetPassword/${token}/token"
-
+    reset_email = f"{url_front}resetPassword/{token}/token"
     msg = Message(
         'Recupera contraseña',
-        html=f"<p> Da click <a href={reset_email}>Aqui</a> para recuperar tu contraseña. </p>",
+        html=f"<p> Da click <a href='{reset_email}'>Aqui</a> para recuperar tu contraseña. </p>",
         recipients=[email],
         sender='taskflowproyect@gmail.com'
     )
-
-    #mail.send(msg)
-
+    mail.send(msg)
     return jsonify({"msg": "Correo enviado exitosamente"}), 200
 
 
@@ -47,12 +43,9 @@ def reset_password():
     new_password = data.get('new_password')
 
     serializer = URLSafeTimedSerializer(os.getenv("MAIL_PASSWORD"))
-
-    email = serializer.loads(token[1:], salt="password-reset", max_age=60)
-
+    email = serializer.loads(token, salt="password-reset", max_age=60)
     user = User.query.filter_by(email=email).first()
     hashed_password = generate_password_hash(new_password)
     user.password = hashed_password
     db.session.commit()
-
     return jsonify({"msg": "Contraseña cambiada correctamente"}), 200

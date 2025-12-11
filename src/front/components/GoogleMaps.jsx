@@ -5,6 +5,7 @@ function GoogleMaps({ lat, lng, setLat, setLng, address, setAddress }) {
     const mapRef = useRef(null);
     const markerRef = useRef(null);
     const [search, setSearch] = useState("");
+    const [mapInstance, setMapInstance] = useState(null);
 
     const fetchAddress = (latitude, longitude) => {
         const key = import.meta.env.VITE_GOOGLE_MAPS_KEY || '';
@@ -35,6 +36,16 @@ function GoogleMaps({ lat, lng, setLat, setLng, address, setAddress }) {
                     setLat(loc.lat);
                     setLng(loc.lng);
                     setAddress(data.results[0].formatted_address);
+                    if (mapInstance) {
+                        mapInstance.setCenter(loc);
+                        if (markerRef.current) {
+                            if (markerRef.current.setPosition) {
+                                markerRef.current.setPosition(loc);
+                            } else {
+                                markerRef.current.position = loc;
+                            }
+                        }
+                    }
                 }
             });
     };
@@ -46,12 +57,17 @@ function GoogleMaps({ lat, lng, setLat, setLng, address, setAddress }) {
     useEffect(() => {
         function safeInitMap() {
             if (window.google && window.google.maps && typeof window.google.maps.Map === "function") {
-                const center = { lat: lat ? parseFloat(lat) : 20, lng: lng ? parseFloat(lng) : -99 };
+                const center = {
+                    lat: lat ? parseFloat(lat) : 40.4637, // España
+                    lng: lng ? parseFloat(lng) : -3.7492
+                };
                 const map = new window.google.maps.Map(mapRef.current, {
                     center,
                     zoom: 5,
-                    mapId: "12fb4a783b70dc8349a13bb3"
+                    mapId: "12fb4a783b70dc8349a13bb3",
+                    scrollwheel: true
                 });
+                setMapInstance(map);
                 if (window.google.maps.marker && window.google.maps.marker.AdvancedMarkerElement) {
                     markerRef.current = new window.google.maps.marker.AdvancedMarkerElement({
                         position: center,
@@ -120,7 +136,16 @@ function GoogleMaps({ lat, lng, setLat, setLng, address, setAddress }) {
         } else {
             safeInitMap();
         }
-    }, [lat, lng]);
+    }, []);
+
+    useEffect(() => {
+        if (search.length > 4) {
+            const timeout = setTimeout(() => {
+                fetchCoords(search);
+            }, 600);
+            return () => clearTimeout(timeout);
+        }
+    }, [search]);
 
     return (
         <>
@@ -131,7 +156,6 @@ function GoogleMaps({ lat, lng, setLat, setLng, address, setAddress }) {
                     setAddress(e.target.value);
                     setSearch(e.target.value);
                 }}
-                onBlur={() => search && fetchCoords(search)}
                 style={{ width: "100%", marginBottom: 8, borderRadius: 8, padding: 8 }}
                 placeholder="Dirección"
             />
